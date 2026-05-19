@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Explorar negocios — VendorList</title>
+  <link rel="stylesheet" href="../css/main.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .explore-header {
+      background: linear-gradient(135deg, #0F0F1A, #1a1a3e);
+      padding: 48px 28px;
+      text-align: center;
+    }
+    .explore-header h1 {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .explore-header p { color: rgba(255,255,255,0.6); margin-bottom: 24px; }
+    .explore-search {
+      max-width: 480px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .explore-search i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+    .explore-search input {
+      width: 100%;
+      padding: 14px 18px 14px 48px;
+      border-radius: 50px;
+      border: none;
+      font-size: 0.95rem;
+      font-family: var(--font-body);
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .explore-search input:focus { outline: none; }
+    .cat-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      padding: 20px 28px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+    }
+    .cat-pill {
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid var(--border);
+      color: var(--text-muted);
+      transition: all .2s;
+    }
+    .cat-pill.active, .cat-pill:hover {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      border-color: transparent;
+    }
+    .results-info {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 20px 0;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="../index.html" class="brand">
+      <span class="brand-icon">⬡</span>
+      <span class="brand-name">VendorList</span>
+    </a>
+    <div class="nav-links" style="margin-left:auto;">
+      <a href="../index.html" class="nav-link"><i class="fas fa-home"></i> Feed</a>
+      <a href="explore.html" class="nav-link active"><i class="fas fa-compass"></i> Explorar</a>
+      <div id="navAuth">
+        <a href="login.html" class="btn-outline">Entrar</a>
+        <a href="register.html" class="btn-primary">Registrar negocio</a>
+      </div>
+      <div id="navUser" class="hidden">
+        <a href="#" id="navProfileLink" class="nav-avatar-link">
+          <img id="navAvatar" src="" alt="" class="nav-avatar"/>
+          <span id="navUsername"></span>
+        </a>
+        <button onclick="logout()" class="btn-outline">Salir</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="explore-header">
+    <h1>Descubre negocios</h1>
+    <p>Encuentra el negocio perfecto para lo que necesitas</p>
+    <div class="explore-search">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Buscar por nombre o categoría..."/>
+    </div>
+  </div>
+
+  <div class="cat-filters">
+    <div class="cat-pill active" data-cat="all">Todos</div>
+    <div class="cat-pill" data-cat="restaurantes">🍽️ Restaurantes</div>
+    <div class="cat-pill" data-cat="tecnologia">💻 Tecnología</div>
+    <div class="cat-pill" data-cat="moda">👗 Moda</div>
+    <div class="cat-pill" data-cat="salud">💆 Salud y Belleza</div>
+    <div class="cat-pill" data-cat="hogar">🛋️ Hogar</div>
+    <div class="cat-pill" data-cat="educacion">🎓 Educación</div>
+    <div class="cat-pill" data-cat="deportes">💪 Deportes</div>
+    <div class="cat-pill" data-cat="servicios">🔧 Servicios</div>
+    <div class="cat-pill" data-cat="otros">📦 Otros</div>
+  </div>
+
+  <div class="results-info" id="resultsInfo">Cargando negocios...</div>
+
+  <div class="explore-grid" id="exploreGrid">
+    <div class="loading-spinner" style="grid-column:1/-1"><div class="spinner"></div></div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from '../js/firebase-config.js';
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { collection, query, getDocs, orderBy, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    let allBusinesses = [];
+    let activeCategory = 'all';
+
+    window.logout = async () => { await signOut(auth); location.href = '../index.html'; };
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        document.getElementById('navAuth').classList.add('hidden');
+        document.getElementById('navUser').classList.remove('hidden');
+        const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+        const bizDoc = await getDoc(doc(db, 'businesses', user.uid));
+        if (bizDoc.exists()) {
+          const biz = bizDoc.data();
+          document.getElementById('navAvatar').src = biz.logoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(biz.name)}&background=FF4D6D&color=fff`;
+          document.getElementById('navUsername').textContent = biz.name;
+          document.getElementById('navProfileLink').href = `profile.html?id=${user.uid}`;
+        }
+      }
+    });
+
+    async function loadBusinesses() {
+      const snap = await getDocs(query(collection(db, 'businesses'), orderBy('createdAt', 'desc')));
+      allBusinesses = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderBusinesses(allBusinesses);
+    }
+
+    function renderBusinesses(list) {
+      const grid = document.getElementById('exploreGrid');
+      const info = document.getElementById('resultsInfo');
+      info.textContent = `${list.length} negocio${list.length !== 1 ? 's' : ''} encontrado${list.length !== 1 ? 's' : ''}`;
+
+      if (list.length === 0) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><i class="fas fa-store-slash"></i><h3>Sin resultados</h3><p>Intenta con otra búsqueda o categoría.</p></div>`;
+        return;
+      }
+
+      grid.innerHTML = '';
+      list.forEach(biz => {
+        const avatarUrl = biz.logoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(biz.name)}&background=FF4D6D&color=fff&size=200`;
+        const card = document.createElement('div');
+        card.className = 'biz-card';
+        card.onclick = () => location.href = `profile.html?id=${biz.id}`;
+
+        const coverStyle = biz.coverUrl
+          ? `<img src="${biz.coverUrl}" alt="Portada"/>`
+          : `<div style="width:100%;height:100%;background:linear-gradient(135deg,${randomGradient(biz.name)})"></div>`;
+
+        card.innerHTML = `
+          <div class="biz-card-cover">
+            ${coverStyle}
+            <img src="${avatarUrl}" alt="${biz.name}" class="biz-card-avatar"
+                 onerror="this.src='https://ui-avatars.com/api/?name=B&background=FF4D6D&color=fff'"/>
+          </div>
+          <div class="biz-card-body">
+            <div class="biz-card-name">${biz.name}</div>
+            <div class="biz-card-cat"><span class="cat-badge">${biz.category || 'General'}</span></div>
+            ${biz.description ? `<div class="biz-card-desc">${biz.description.slice(0,100)}${biz.description.length > 100 ? '...' : ''}</div>` : ''}
+          </div>`;
+        grid.appendChild(card);
+      });
+    }
+
+    function randomGradient(str) {
+      const colors = [
+        '#FF4D6D,#4361EE', '#F72585,#7209B7', '#06D6A0,#4361EE',
+        '#FFB703,#FB8500', '#4361EE,#7209B7', '#FF4D6D,#FB8500'
+      ];
+      const i = str.charCodeAt(0) % colors.length;
+      return colors[i];
+    }
+
+    function filterAndRender() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      let filtered = allBusinesses;
+      if (activeCategory !== 'all') filtered = filtered.filter(b => b.category === activeCategory);
+      if (search) filtered = filtered.filter(b =>
+        b.name?.toLowerCase().includes(search) ||
+        b.category?.toLowerCase().includes(search) ||
+        b.description?.toLowerCase().includes(search)
+      );
+      renderBusinesses(filtered);
+    }
+
+    // Category filters
+    document.querySelectorAll('.cat-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        activeCategory = pill.dataset.cat;
+        filterAndRender();
+      });
+    });
+
+    // Search
+    document.getElementById('searchInput').addEventListener('input', filterAndRender);
+
+    loadBusinesses();
+  </script>
+</body>
+</html>

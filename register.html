@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registrar negocio — VendorList</title>
+  <link rel="stylesheet" href="../css/main.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+  <div class="auth-page" style="padding: 28px 20px;">
+    <div class="auth-card" style="max-width:560px;">
+      <a href="../index.html" class="auth-logo">
+        <span class="brand-icon">⬡</span>
+        <span class="brand-name">VendorList</span>
+      </a>
+      <h1>Registrar mi negocio</h1>
+      <p class="subtitle">Crea tu perfil y empieza a conectar con clientes</p>
+
+      <div id="errorBox" class="hidden" style="background:rgba(255,77,109,0.1);color:var(--primary);padding:12px 16px;border-radius:10px;font-size:0.88rem;margin-bottom:16px;"></div>
+
+      <!-- Paso 1: Cuenta -->
+      <div id="step1">
+        <p style="font-size:0.82rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;">
+          <i class="fas fa-lock"></i> Datos de acceso
+        </p>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Correo electrónico *</label>
+            <input type="email" id="email" placeholder="correo@negocio.com"/>
+          </div>
+          <div class="form-group">
+            <label>Contraseña *</label>
+            <input type="password" id="password" placeholder="Mínimo 6 caracteres"/>
+          </div>
+        </div>
+
+        <p style="font-size:0.82rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin:20px 0 14px;">
+          <i class="fas fa-store"></i> Información del negocio
+        </p>
+        <div class="form-group">
+          <label>Nombre del negocio *</label>
+          <input type="text" id="bizName" placeholder="Ej: Panadería La Estrella"/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Categoría *</label>
+            <select id="category">
+              <option value="">Selecciona...</option>
+              <option value="restaurantes">🍽️ Restaurantes y Comida</option>
+              <option value="tecnologia">💻 Tecnología</option>
+              <option value="moda">👗 Moda y Ropa</option>
+              <option value="salud">💆 Salud y Belleza</option>
+              <option value="hogar">🛋️ Hogar y Decoración</option>
+              <option value="educacion">🎓 Educación</option>
+              <option value="deportes">💪 Deportes y Fitness</option>
+              <option value="servicios">🔧 Servicios Profesionales</option>
+              <option value="otros">📦 Otros</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Teléfono / WhatsApp</label>
+            <input type="tel" id="phone" placeholder="+52 81 0000 0000"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Descripción del negocio</label>
+          <textarea id="description" placeholder="Describe qué hace tu negocio, qué lo hace especial..." rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Sitio web o redes sociales</label>
+          <input type="url" id="website" placeholder="https://www.minegocio.com"/>
+        </div>
+        <div class="form-group">
+          <label>Logo del negocio (URL de imagen)</label>
+          <input type="url" id="logoUrl" placeholder="https://..." oninput="previewLogo(this.value)"/>
+          <div id="logoPreview" style="margin-top:8px;"></div>
+          <small style="color:var(--text-muted);">Puedes usar un link de tu logo en línea, o dejarlo vacío para usar las iniciales.</small>
+        </div>
+        <div class="form-group">
+          <label>Imagen de portada (URL)</label>
+          <input type="url" id="coverUrl" placeholder="https://..."/>
+        </div>
+
+        <button class="btn-full" onclick="handleRegister()" id="registerBtn">
+          Crear perfil de negocio →
+        </button>
+
+        <div class="auth-switch">
+          ¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from '../js/firebase-config.js';
+    import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    window.previewLogo = (url) => {
+      const preview = document.getElementById('logoPreview');
+      if (url) {
+        preview.innerHTML = `<img src="${url}" style="width:60px;height:60px;border-radius:14px;object-fit:cover;border:2px solid var(--border);" onerror="this.remove()"/>`;
+      } else {
+        preview.innerHTML = '';
+      }
+    };
+
+    window.handleRegister = async () => {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const bizName = document.getElementById('bizName').value.trim();
+      const category = document.getElementById('category').value;
+      const phone = document.getElementById('phone').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const website = document.getElementById('website').value.trim();
+      const logoUrl = document.getElementById('logoUrl').value.trim();
+      const coverUrl = document.getElementById('coverUrl').value.trim();
+      const errorBox = document.getElementById('errorBox');
+      const btn = document.getElementById('registerBtn');
+
+      errorBox.classList.add('hidden');
+
+      if (!email || !password || !bizName || !category) {
+        errorBox.textContent = 'Por favor completa los campos obligatorios (*).';
+        errorBox.classList.remove('hidden');
+        return;
+      }
+
+      if (password.length < 6) {
+        errorBox.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+        errorBox.classList.remove('hidden');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Creando perfil...';
+
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = cred.user.uid;
+
+        // Guardar en Firestore
+        await setDoc(doc(db, 'businesses', uid), {
+          name: bizName,
+          category,
+          phone: phone || null,
+          description: description || null,
+          website: website || null,
+          logoUrl: logoUrl || null,
+          coverUrl: coverUrl || null,
+          email,
+          followers: 0,
+          postsCount: 0,
+          createdAt: serverTimestamp()
+        });
+
+        window.location.href = `profile.html?id=${uid}`;
+      } catch (err) {
+        let msg = 'Error al registrar.';
+        if (err.code === 'auth/email-already-in-use') msg = 'Este correo ya está registrado.';
+        if (err.code === 'auth/invalid-email') msg = 'Correo inválido.';
+        if (err.code === 'auth/weak-password') msg = 'Contraseña muy débil.';
+        errorBox.textContent = msg;
+        errorBox.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Crear perfil de negocio →';
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Perfil — VendorList</title>
+  <link rel="stylesheet" href="../css/main.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .profile-info-card { background: var(--bg-card); border-radius: var(--radius); padding: 22px; border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 20px; }
+    .profile-info-card h3 { font-family: var(--font-display); font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin-bottom: 14px; }
+    .info-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+    .info-row:last-child { border-bottom: none; }
+    .info-row i { width: 18px; color: var(--primary); margin-top: 2px; flex-shrink: 0; }
+    .add-product-btn { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: linear-gradient(135deg, rgba(255,77,109,0.08), rgba(67,97,238,0.08)); border: 2px dashed var(--border); border-radius: var(--radius); color: var(--primary); font-weight: 600; font-size: 0.88rem; width: 100%; justify-content: center; transition: all .2s; margin-bottom: 16px; }
+    .add-product-btn:hover { border-color: var(--primary); background: rgba(255,77,109,0.05); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .edit-banner { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; padding: 10px 20px; text-align: center; font-size: 0.88rem; font-weight: 500; display: none; }
+    .edit-banner a { color: #fff; text-decoration: underline; margin-left: 8px; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="navbar">
+    <a href="../index.html" class="brand">
+      <span class="brand-icon">⬡</span>
+      <span class="brand-name">VendorList</span>
+    </a>
+    <div class="nav-links" style="margin-left:auto;">
+      <a href="../index.html" class="nav-link"><i class="fas fa-home"></i> Feed</a>
+      <a href="explore.html" class="nav-link"><i class="fas fa-compass"></i> Explorar</a>
+      <div id="navAuth">
+        <a href="login.html" class="btn-outline">Entrar</a>
+        <a href="register.html" class="btn-primary">Registrar negocio</a>
+      </div>
+      <div id="navUser" class="hidden">
+        <a href="#" id="navProfileLink" class="nav-avatar-link">
+          <img id="navAvatar" src="" alt="" class="nav-avatar"/>
+          <span id="navUsername"></span>
+        </a>
+        <button onclick="logout()" class="btn-outline">Salir</button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="editBanner" class="edit-banner">
+    Este es tu perfil. <a href="#" onclick="openEditModal()">Editar información</a>
+  </div>
+
+  <!-- COVER -->
+  <div class="profile-cover" id="profileCover">
+    <div class="profile-cover-overlay"></div>
+  </div>
+
+  <!-- HEADER -->
+  <div style="background: var(--bg-card); border-bottom: 1px solid var(--border);">
+    <div class="profile-header">
+      <div class="profile-avatar-wrap">
+        <img id="profileAvatar" src="" alt="Logo" class="profile-avatar"
+             onerror="this.src='https://ui-avatars.com/api/?name=B&background=FF4D6D&color=fff&size=200'"/>
+      </div>
+      <div class="profile-meta">
+        <div class="profile-info">
+          <h1 class="profile-name" id="profileName">Cargando...</h1>
+          <p class="profile-tagline" id="profileTagline"></p>
+          <div class="profile-stats">
+            <div class="stat"><div class="stat-value" id="postsCount">0</div><div class="stat-label">publicaciones</div></div>
+            <div class="stat"><div class="stat-value" id="productsCount">0</div><div class="stat-label">productos</div></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;" id="profileActions">
+          <a href="#" id="contactBtn" class="btn-primary hidden"><i class="fas fa-comment"></i> Contactar</a>
+          <a href="#" id="websiteBtn" class="btn-outline hidden" target="_blank"><i class="fas fa-globe"></i> Sitio web</a>
+        </div>
+      </div>
+    </div>
+    <div class="profile-tabs">
+      <div class="profile-tab active" onclick="switchTab('posts', this)"><i class="fas fa-th"></i> Publicaciones</div>
+      <div class="profile-tab" onclick="switchTab('catalog', this)"><i class="fas fa-box"></i> Catálogo</div>
+      <div class="profile-tab" onclick="switchTab('info', this)"><i class="fas fa-info-circle"></i> Información</div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="profile-body">
+    <!-- SIDEBAR INFO -->
+    <aside id="sideInfo">
+      <div class="profile-info-card" id="infoCard">
+        <h3>Sobre el negocio</h3>
+        <div id="infoRows"><div class="loading-mini"><div class="spinner-sm"></div></div></div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main>
+      <!-- Tab: Publicaciones -->
+      <div class="tab-content active" id="tab-posts">
+        <div id="postsOwnerActions" class="hidden" style="margin-bottom:16px;">
+          <button class="btn-primary" onclick="window.openCreatePost()"><i class="fas fa-plus"></i> Nueva publicación</button>
+        </div>
+        <div id="profilePosts">
+          <div class="loading-spinner"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- Tab: Catálogo -->
+      <div class="tab-content" id="tab-catalog">
+        <div id="catalogOwnerActions" class="hidden" style="margin-bottom:16px;">
+          <button class="add-product-btn" onclick="openProductModal()">
+            <i class="fas fa-plus-circle"></i> Agregar producto al catálogo
+          </button>
+        </div>
+        <div class="catalog-grid" id="catalogGrid">
+          <div class="loading-spinner" style="grid-column:1/-1;"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- Tab: Información -->
+      <div class="tab-content" id="tab-info">
+        <div class="profile-info-card" id="fullInfoCard">
+          <h3>Información completa</h3>
+          <div id="fullInfoRows"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL CREAR POST -->
+  <div class="modal-overlay hidden" id="postModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Nueva publicación</h2>
+        <button class="modal-close" onclick="closePostModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <textarea id="postText" placeholder="Comparte algo con tus seguidores..." rows="4"></textarea>
+        <div class="media-preview" id="mediaPreview"></div>
+        <div class="post-type-tabs">
+          <button class="tab-btn active" onclick="setPostType('text', this)"><i class="fas fa-align-left"></i> Texto</button>
+          <button class="tab-btn" onclick="setPostType('photo', this)"><i class="fas fa-image"></i> Foto</button>
+          <button class="tab-btn" onclick="setPostType('video', this)"><i class="fas fa-video"></i> Video</button>
+        </div>
+        <div id="fileInputArea" class="hidden">
+          <label class="file-label">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span id="fileLabel">Seleccionar archivo</span>
+            <input type="file" id="mediaFile" accept="image/*,video/*" onchange="previewMedia(event)"/>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" onclick="closePostModal()">Cancelar</button>
+        <button class="btn-primary" onclick="submitPost()"><i class="fas fa-paper-plane"></i> Publicar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL AGREGAR PRODUCTO -->
+  <div class="modal-overlay hidden" id="productModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Agregar producto</h2>
+        <button class="modal-close" onclick="closeProductModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Nombre del producto *</label>
+          <input type="text" id="prodName" placeholder="Ej: Laptop HP 15"/>
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea id="prodDesc" placeholder="Características, uso, detalles..." rows="3"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Precio</label>
+            <input type="number" id="prodPrice" placeholder="0.00" step="0.01" min="0"/>
+          </div>
+          <div class="form-group">
+            <label>Moneda</label>
+            <select id="prodCurrency">
+              <option value="MXN">MXN (Peso mexicano)</option>
+              <option value="USD">USD (Dólar)</option>
+              <option value="EUR">EUR (Euro)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>URL de imagen del producto</label>
+          <input type="url" id="prodImageUrl" placeholder="https://..." oninput="previewProdImg(this.value)"/>
+          <div id="prodImgPreview" style="margin-top:8px;"></div>
+        </div>
+        <div class="form-group">
+          <label>Disponibilidad</label>
+          <select id="prodAvailable">
+            <option value="true">✅ Disponible</option>
+            <option value="false">❌ No disponible</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" onclick="closeProductModal()">Cancelar</button>
+        <button class="btn-primary" onclick="submitProduct()" id="saveProdBtn">
+          <i class="fas fa-save"></i> Guardar producto
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL MEDIA -->
+  <div class="modal-overlay hidden" id="mediaModal">
+    <div class="media-modal-inner">
+      <button class="modal-close-float" onclick="document.getElementById('mediaModal').classList.add('hidden')"><i class="fas fa-times"></i></button>
+      <div id="mediaModalContent"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db, storage } from '../js/firebase-config.js';
+    import {
+      onAuthStateChanged, signOut
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import {
+      doc, getDoc, collection, query, where, orderBy,
+      onSnapshot, addDoc, serverTimestamp, getDocs
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import {
+      ref, uploadBytes, getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+    const params = new URLSearchParams(location.search);
+    const bizId = params.get('id');
+    let currentUser = null;
+    let currentBusiness = null;
+    let viewedBusiness = null;
+    let isOwner = false;
+    let currentPostType = 'text';
+    let selectedFile = null;
+
+    // --- TOAST ---
+    window.showToast = (msg, type = '') => {
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      t.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 3500);
+    };
+
+    window.logout = async () => {
+      await signOut(auth);
+      location.href = '../index.html';
+    };
+
+    // --- AUTH STATE ---
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      if (user) {
+        const navAuth = document.getElementById('navAuth');
+        const navUser = document.getElementById('navUser');
+        if (navAuth) navAuth.classList.add('hidden');
+        if (navUser) {
+          navUser.classList.remove('hidden');
+          const bizDoc = await getDoc(doc(db, 'businesses', user.uid));
+          if (bizDoc.exists()) {
+            currentBusiness = { id: bizDoc.id, ...bizDoc.data() };
+            document.getElementById('navAvatar').src = currentBusiness.logoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentBusiness.name)}&background=FF4D6D&color=fff`;
+            document.getElementById('navUsername').textContent = currentBusiness.name;
+            document.getElementById('navProfileLink').href = `profile.html?id=${user.uid}`;
+          }
+        }
+        isOwner = (user.uid === bizId);
+        if (isOwner) {
+          document.getElementById('editBanner').style.display = 'block';
+          document.getElementById('postsOwnerActions').classList.remove('hidden');
+          document.getElementById('catalogOwnerActions').classList.remove('hidden');
+        }
+      }
+    });
+
+    // --- LOAD BUSINESS ---
+    async function loadBusiness() {
+      if (!bizId) { document.getElementById('profileName').textContent = 'Negocio no encontrado'; return; }
+      const bizDoc = await getDoc(doc(db, 'businesses', bizId));
+      if (!bizDoc.exists()) { document.getElementById('profileName').textContent = 'Negocio no encontrado'; return; }
+      viewedBusiness = { id: bizDoc.id, ...bizDoc.data() };
+
+      // Cover
+      const cover = document.getElementById('profileCover');
+      if (viewedBusiness.coverUrl) {
+        cover.innerHTML = `<img src="${viewedBusiness.coverUrl}" alt="Portada"/><div class="profile-cover-overlay"></div>`;
+      }
+
+      // Avatar
+      const avatar = document.getElementById('profileAvatar');
+      avatar.src = viewedBusiness.logoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(viewedBusiness.name)}&background=FF4D6D&color=fff&size=200`;
+
+      document.getElementById('profileName').textContent = viewedBusiness.name;
+      document.getElementById('profileTagline').textContent = viewedBusiness.description || '';
+      document.title = `${viewedBusiness.name} — VendorList`;
+
+      // Acciones
+      if (viewedBusiness.phone) {
+        const contactBtn = document.getElementById('contactBtn');
+        contactBtn.href = `https://wa.me/${viewedBusiness.phone.replace(/\D/g,'')}`;
+        contactBtn.target = '_blank';
+        contactBtn.classList.remove('hidden');
+      }
+      if (viewedBusiness.website) {
+        const websiteBtn = document.getElementById('websiteBtn');
+        websiteBtn.href = viewedBusiness.website;
+        websiteBtn.classList.remove('hidden');
+      }
+
+      renderInfoRows();
+    }
+
+    function renderInfoRows() {
+      const rows = [
+        { icon: 'fa-tag', label: 'Categoría', value: viewedBusiness.category },
+        { icon: 'fa-envelope', label: 'Correo', value: viewedBusiness.email },
+        { icon: 'fa-phone', label: 'Teléfono', value: viewedBusiness.phone },
+        { icon: 'fa-globe', label: 'Sitio web', value: viewedBusiness.website, link: true },
+        { icon: 'fa-calendar', label: 'Miembro desde', value: viewedBusiness.createdAt?.toDate?.()?.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' }) }
+      ].filter(r => r.value);
+
+      const html = rows.map(r => `
+        <div class="info-row">
+          <i class="fas ${r.icon}"></i>
+          <div><small style="color:var(--text-muted);font-size:0.75rem">${r.label}</small><br/>
+          ${r.link ? `<a href="${r.value}" target="_blank" style="color:var(--secondary)">${r.value}</a>` : r.value}</div>
+        </div>`).join('');
+
+      document.getElementById('infoRows').innerHTML = html || '<p style="color:var(--text-muted);font-size:0.88rem">Sin información adicional.</p>';
+      document.getElementById('fullInfoRows').innerHTML = html || '<p style="color:var(--text-muted);font-size:0.88rem">Sin información adicional.</p>';
+    }
+
+    // --- LOAD POSTS ---
+    function loadPosts() {
+      if (!bizId) return;
+      const q = query(
+        collection(db, 'posts'),
+        where('businessId', '==', bizId),
+        orderBy('createdAt', 'desc')
+      );
+      onSnapshot(q, (snap) => {
+        document.getElementById('postsCount').textContent = snap.size;
+        if (snap.empty) {
+          document.getElementById('profilePosts').innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-image"></i>
+              <h3>Sin publicaciones</h3>
+              <p>Este negocio aún no ha publicado nada.</p>
+            </div>`;
+          return;
+        }
+        document.getElementById('profilePosts').innerHTML = '';
+        snap.forEach(d => {
+          const post = { id: d.id, ...d.data() };
+          document.getElementById('profilePosts').appendChild(renderPost(post));
+        });
+      });
+    }
+
+    function renderPost(post) {
+      const card = document.createElement('div');
+      card.className = 'post-card';
+      const time = post.createdAt?.toDate?.()?.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }) || '';
+      let mediaHtml = '';
+      if (post.mediaType === 'photo' && post.mediaUrl) {
+        mediaHtml = `<div class="post-media" onclick="showMedia('${post.mediaUrl}')">
+          <img src="${post.mediaUrl}" loading="lazy"/>
+          <div class="media-overlay"><div class="play-btn"><i class="fas fa-expand"></i></div></div>
+        </div>`;
+      } else if (post.mediaType === 'video' && post.mediaUrl) {
+        mediaHtml = `<div class="post-media"><video controls preload="metadata"><source src="${post.mediaUrl}"/></video></div>`;
+      }
+      card.innerHTML = `
+        <div class="post-header" style="padding-bottom:10px;">
+          <span class="post-time" style="margin-left:auto;">${time}</span>
+        </div>
+        ${post.text ? `<p class="post-text">${post.text}</p>` : ''}
+        ${mediaHtml}
+        <div class="post-actions">
+          <span class="action-btn"><i class="fas fa-heart" style="color:var(--primary)"></i> ${(post.likes||[]).length} me gusta</span>
+        </div>`;
+      return card;
+    }
+
+    window.showMedia = (url) => {
+      document.getElementById('mediaModalContent').innerHTML = `<img src="${url}"/>`;
+      document.getElementById('mediaModal').classList.remove('hidden');
+    };
+
+    // --- CATALOG ---
+    function loadCatalog() {
+      if (!bizId) return;
+      const q = query(collection(db, 'products'), where('businessId', '==', bizId), orderBy('createdAt', 'desc'));
+      onSnapshot(q, (snap) => {
+        document.getElementById('productsCount').textContent = snap.size;
+        const grid = document.getElementById('catalogGrid');
+        if (snap.empty) {
+          grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><i class="fas fa-box-open"></i><h3>Catálogo vacío</h3><p>Este negocio aún no tiene productos.</p></div>`;
+          return;
+        }
+        grid.innerHTML = '';
+        snap.forEach(d => grid.appendChild(renderProduct({ id: d.id, ...d.data() })));
+      });
+    }
+
+    function renderProduct(p) {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      const priceText = p.price ? `${p.currency || 'MXN'} $${parseFloat(p.price).toLocaleString('es-MX', {minimumFractionDigits:2})}` : 'Consultar precio';
+      card.innerHTML = `
+        ${p.imageUrl
+          ? `<img src="${p.imageUrl}" alt="${p.name}" class="product-img" onerror="this.parentElement.querySelector('.product-img-placeholder').style.display='flex';this.remove()"/>`
+          : ''}
+        <div class="product-img-placeholder" style="${p.imageUrl ? 'display:none' : ''}">📦</div>
+        <div class="product-info">
+          <div class="product-name">${p.name}</div>
+          ${p.description ? `<div class="product-desc">${p.description}</div>` : ''}
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+            <div class="product-price">${priceText}</div>
+            ${p.available === false ? '<span style="font-size:0.75rem;color:var(--text-muted)">No disponible</span>' : '<span style="font-size:0.75rem;color:var(--success)">✅ Disponible</span>'}
+          </div>
+        </div>`;
+      return card;
+    }
+
+    // --- PRODUCT MODAL ---
+    window.openProductModal = () => document.getElementById('productModal').classList.remove('hidden');
+    window.closeProductModal = () => document.getElementById('productModal').classList.add('hidden');
+    window.previewProdImg = (url) => {
+      const el = document.getElementById('prodImgPreview');
+      el.innerHTML = url ? `<img src="${url}" style="height:80px;border-radius:10px;object-fit:cover;" onerror="this.remove()"/>` : '';
+    };
+
+    window.submitProduct = async () => {
+      const name = document.getElementById('prodName').value.trim();
+      const desc = document.getElementById('prodDesc').value.trim();
+      const price = document.getElementById('prodPrice').value;
+      const currency = document.getElementById('prodCurrency').value;
+      const imageUrl = document.getElementById('prodImageUrl').value.trim();
+      const available = document.getElementById('prodAvailable').value === 'true';
+      const btn = document.getElementById('saveProdBtn');
+
+      if (!name) { showToast('El nombre del producto es obligatorio', 'error'); return; }
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;"></div> Guardando...';
+
+      try {
+        await addDoc(collection(db, 'products'), {
+          businessId: bizId,
+          name, desc, price: price ? parseFloat(price) : null,
+          currency, imageUrl: imageUrl || null, available,
+          description: desc,
+          createdAt: serverTimestamp()
+        });
+        showToast('Producto agregado', 'success');
+        closeProductModal();
+        document.getElementById('prodName').value = '';
+        document.getElementById('prodDesc').value = '';
+        document.getElementById('prodPrice').value = '';
+        document.getElementById('prodImageUrl').value = '';
+        document.getElementById('prodImgPreview').innerHTML = '';
+      } catch (e) {
+        showToast('Error al guardar', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-save"></i> Guardar producto';
+      }
+    };
+
+    // --- POST MODAL ---
+    window.openCreatePost = () => document.getElementById('postModal').classList.remove('hidden');
+    window.closePostModal = () => {
+      document.getElementById('postModal').classList.add('hidden');
+      document.getElementById('postText').value = '';
+      document.getElementById('mediaPreview').innerHTML = '';
+      selectedFile = null;
+    };
+
+    window.setPostType = (type, btn) => {
+      currentPostType = type;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      const fa = document.getElementById('fileInputArea');
+      const fl = document.getElementById('fileLabel');
+      const mf = document.getElementById('mediaFile');
+      if (type === 'text') { fa.classList.add('hidden'); }
+      else {
+        fa.classList.remove('hidden');
+        fl.textContent = type === 'photo' ? 'Seleccionar imagen' : 'Seleccionar video';
+        mf.accept = type === 'photo' ? 'image/*' : 'video/*';
+        document.getElementById('mediaPreview').innerHTML = '';
+        selectedFile = null;
+      }
+    };
+
+    window.previewMedia = (e) => {
+      selectedFile = e.target.files[0];
+      const preview = document.getElementById('mediaPreview');
+      if (!selectedFile) { preview.innerHTML = ''; return; }
+      const url = URL.createObjectURL(selectedFile);
+      preview.innerHTML = currentPostType === 'photo'
+        ? `<img src="${url}" style="border-radius:10px;max-height:180px;"/>`
+        : `<video src="${url}" controls style="max-height:180px;border-radius:10px;"></video>`;
+    };
+
+    window.submitPost = async () => {
+      if (!currentUser || !currentBusiness) { showToast('Inicia sesión', 'error'); return; }
+      const text = document.getElementById('postText').value.trim();
+      if (!text && !selectedFile) { showToast('Escribe algo o sube un archivo', 'error'); return; }
+      const btn = document.querySelector('#postModal .btn-primary');
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;"></div> Publicando...';
+
+      try {
+        let mediaUrl = null, mediaType = 'text';
+        if (selectedFile) {
+          mediaType = currentPostType;
+          const sRef = ref(storage, `posts/${currentUser.uid}/${Date.now()}_${selectedFile.name}`);
+          const snap = await uploadBytes(sRef, selectedFile);
+          mediaUrl = await getDownloadURL(snap.ref);
+        }
+        await addDoc(collection(db, 'posts'), {
+          businessId: currentUser.uid, businessName: currentBusiness.name,
+          businessCategory: currentBusiness.category, businessLogoUrl: currentBusiness.logoUrl || null,
+          text: text || null, mediaUrl, mediaType, likes: [], createdAt: serverTimestamp()
+        });
+        showToast('¡Publicado!', 'success');
+        closePostModal();
+        switchTab('posts', document.querySelector('.profile-tab'));
+      } catch (e) {
+        showToast('Error al publicar', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Publicar';
+      }
+    };
+
+    // --- TABS ---
+    window.switchTab = (tab, btn) => {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(`tab-${tab}`).classList.add('active');
+      if (btn) btn.classList.add('active');
+    };
+
+    // --- INIT ---
+    loadBusiness();
+    loadPosts();
+    loadCatalog();
+
+    // Close modals on overlay click
+    ['postModal','productModal','mediaModal'].forEach(id => {
+      document.getElementById(id)?.addEventListener('click', e => {
+        if (e.target.id === id) document.getElementById(id).classList.add('hidden');
+      });
+    });
+  </script>
+</body>
+</html>
