@@ -1,159 +1,58 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VendorList — Red de Negocios</title>
-  <link rel="stylesheet" href="css/main.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grupos - e-class</title>
+    <link rel="stylesheet" href="../vendorlist.github.io/Home.css">
+    <link rel="stylesheet" href="../vendorlist.github.io/Extras/Responsive.css">
+    <script src="https://kit.fontawesome.com/29079834be.js" crossorigin="anonymous"></script>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav class="navbar">
-    <a href="index.html" class="brand">
-      <span class="brand-icon">⬡</span>
-      <span class="brand-name">VendorList</span>
-    </a>
-    <div class="nav-search">
-      <i class="fas fa-search"></i>
-      <input type="text" id="searchInput" placeholder="Buscar negocios, categorías..." />
+    <div class="nav">
+        <h1 class="title">Grupos</h1>
     </div>
-    <div class="nav-links">
-      <a href="index.html" class="nav-link active"><i class="fas fa-home"></i> Feed</a>
-      <a href="pages/explore.html" class="nav-link"><i class="fas fa-compass"></i> Explorar</a>
-      <div id="navAuth">
-        <a href="pages/login.html" class="btn-outline">Entrar</a>
-        <a href="pages/register.html" class="btn-primary">Registrar negocio</a>
-      </div>
-      <div id="navUser" class="hidden">
-        <a href="#" id="navProfileLink" class="nav-avatar-link">
-          <img id="navAvatar" src="" alt="Avatar" class="nav-avatar" />
-          <span id="navUsername"></span>
+
+    <div class="categorias">
+        <a href="../vendorlist.github.io/Carrera/Carrera.html" class="card">
+            <div class="text">
+                <!--<h3>Multimedia y Animación Digital</h3>-->
+                <h3>LMAD</h3>
+            </div>
         </a>
-        <button onclick="logout()" class="btn-outline">Salir</button>
-      </div>
+        <a href="../vendorlist.github.io/Carrera/Carrera.html" class="card">
+            <div class="text">
+                <h3>Física</h3>
+            </div>
+        </a>
+        <a href="../vendorlist.github.io/Carrera/Carrera.html" class="card">
+            <div class="text">
+                <!--<h3>Seguridad en Tecnologías de Información</h3>-->
+                <h3>LSTI</h3>
+            </div>
+        </a>
+        <a href="../vendorlist.github.io/Carrera/Carrera.html" class="card">
+            <div class="text">
+                <h3>Actuaría</h3>
+            </div>
+        </a>
+        <a href="../vendorlist.github.io/Carrera/Carrera.html" class="card">
+            <div class="text">
+                <h3>Matemáticas</h3>
+            </div>
+        </a>
     </div>
-  </nav>
 
-  <!-- HERO (visible solo si no hay sesión) -->
-  <section class="hero" id="heroSection">
-    <div class="hero-bg"></div>
-    <div class="hero-content">
-      <h1>La red social<br/><span class="gradient-text">para negocios</span></h1>
-      <p>Conecta tu negocio con miles de clientes. Publica productos, comparte contenido y haz crecer tu marca.</p>
-      <a href="pages/register.html" class="btn-hero">Registrar mi negocio gratis →</a>
-    </div>
-    <div class="hero-cards">
-      <div class="floating-card fc1"><i class="fas fa-store"></i> +2,400 negocios</div>
-      <div class="floating-card fc2"><i class="fas fa-box"></i> Catálogos de productos</div>
-      <div class="floating-card fc3"><i class="fas fa-chart-line"></i> Crecimiento real</div>
-    </div>
-  </section>
-
-  <!-- MAIN LAYOUT -->
-  <main class="main-layout">
-    <!-- SIDEBAR IZQUIERDO -->
-    <aside class="sidebar-left">
-      <div class="sidebar-card">
-        <h3>Categorías</h3>
-        <ul class="category-list" id="categoryList">
-          <li class="cat-item active" data-cat="all"><i class="fas fa-th"></i> Todos</li>
-          <li class="cat-item" data-cat="restaurantes"><i class="fas fa-utensils"></i> Restaurantes</li>
-          <li class="cat-item" data-cat="tecnologia"><i class="fas fa-laptop"></i> Tecnología</li>
-          <li class="cat-item" data-cat="moda"><i class="fas fa-tshirt"></i> Moda</li>
-          <li class="cat-item" data-cat="salud"><i class="fas fa-heartbeat"></i> Salud y Belleza</li>
-          <li class="cat-item" data-cat="hogar"><i class="fas fa-couch"></i> Hogar</li>
-          <li class="cat-item" data-cat="educacion"><i class="fas fa-graduation-cap"></i> Educación</li>
-          <li class="cat-item" data-cat="deportes"><i class="fas fa-dumbbell"></i> Deportes</li>
-          <li class="cat-item" data-cat="servicios"><i class="fas fa-wrench"></i> Servicios</li>
-          <li class="cat-item" data-cat="otros"><i class="fas fa-ellipsis-h"></i> Otros</li>
-        </ul>
-      </div>
-    </aside>
-
-    <!-- FEED CENTRAL -->
-    <section class="feed">
-      <!-- Create post (solo autenticados) -->
-      <div class="create-post hidden" id="createPostBox">
-        <div class="create-post-header">
-          <img id="postAvatar" src="" alt="Avatar" class="post-avatar-sm"/>
-          <button class="create-trigger" id="openPostModal">
-            <span>¿Qué quieres compartir hoy?</span>
-          </button>
-        </div>
-        <div class="create-post-actions">
-          <button onclick="openModal('photo')"><i class="fas fa-image"></i> Foto</button>
-          <button onclick="openModal('video')"><i class="fas fa-video"></i> Video</button>
-          <button onclick="openModal('text')"><i class="fas fa-align-left"></i> Texto</button>
-        </div>
-      </div>
-
-      <!-- Posts feed -->
-      <div id="feedContainer">
-        <div class="loading-spinner"><div class="spinner"></div><p>Cargando publicaciones...</p></div>
-      </div>
-    </section>
-
-    <!-- SIDEBAR DERECHO -->
-    <aside class="sidebar-right">
-      <div class="sidebar-card">
-        <h3>Negocios destacados</h3>
-        <div id="featuredList">
-          <div class="loading-mini"><div class="spinner-sm"></div></div>
-        </div>
-      </div>
-      <div class="sidebar-card">
-        <h3>¿Tienes un negocio?</h3>
-        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px;">Únete y conecta con miles de clientes potenciales.</p>
-        <a href="pages/register.html" class="btn-primary" style="display:block;text-align:center;">Crear perfil →</a>
-      </div>
-    </aside>
-  </main>
-
-  <!-- MODAL CREAR PUBLICACIÓN -->
-  <div class="modal-overlay hidden" id="postModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h2>Nueva publicación</h2>
-        <button class="modal-close" onclick="closePostModal()"><i class="fas fa-times"></i></button>
-      </div>
-      <div class="modal-body">
-        <textarea id="postText" placeholder="Escribe algo sobre tu negocio, producto o servicio..." rows="4"></textarea>
-        <div class="media-preview" id="mediaPreview"></div>
-        <div class="post-type-tabs">
-          <button class="tab-btn active" onclick="setPostType('text', this)"><i class="fas fa-align-left"></i> Texto</button>
-          <button class="tab-btn" onclick="setPostType('photo', this)"><i class="fas fa-image"></i> Foto</button>
-          <button class="tab-btn" onclick="setPostType('video', this)"><i class="fas fa-video"></i> Video</button>
-        </div>
-        <div id="fileInputArea" class="hidden">
-          <label class="file-label">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <span id="fileLabel">Seleccionar archivo</span>
-            <input type="file" id="mediaFile" accept="image/*,video/*" onchange="previewMedia(event)"/>
-          </label>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-outline" onclick="closePostModal()">Cancelar</button>
-        <button class="btn-primary" onclick="submitPost()"><i class="fas fa-paper-plane"></i> Publicar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL VER MEDIA -->
-  <div class="modal-overlay hidden" id="mediaModal">
-    <div class="media-modal-inner">
-      <button class="modal-close-float" onclick="closeMediaModal()"><i class="fas fa-times"></i></button>
-      <div id="mediaModalContent"></div>
-    </div>
-  </div>
-
-  <script type="module" src="js/firebase-config.js"></script>
-  <script type="module" src="js/auth.js"></script>
-  <script type="module" src="js/feed.js"></script>
-  <script type="module" src="js/post.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../vendorlist.github.io/Home.js"></script>
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </body>
 </html>

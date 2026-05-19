@@ -29,7 +29,7 @@ vendorlist/
 2. Crea un proyecto nuevo: **vendorlist**
 3. En **Authentication** → habilita **Email/Password**
 4. En **Firestore Database** → crea base de datos en modo producción
-5. En **Storage** → activa el almacenamiento
+5. En **Storage** → activa el almacenamiento ------
 6. Ve a **Configuración del proyecto** → **Tus apps** → agrega una **app web**
 7. Copia el objeto `firebaseConfig` y pégalo en `js/firebase-config.js`
 

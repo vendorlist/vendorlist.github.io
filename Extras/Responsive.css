@@ -1,0 +1,23 @@
+.dropdown-menu .dropdown-item{
+    color: black;
+}
+.dropdown-menu .nav-link:hover{
+    color: brown;
+}
+.navBtns .menuABC{
+    display: none;
+}
+@media screen and (max-width: 887px){
+    .nav-item{
+        display: none;
+    }
+    .nav-toggle{
+        display: block;
+    }
+    /*.navBtns .menuABC{
+        display: block;
+    }*/
+}
+@media screen and (max-width: 739px){
+
+}

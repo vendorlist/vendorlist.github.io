@@ -1,0 +1,208 @@
+.feed{
+    width: 100%;
+}
+
+/* sección de comentarios */
+
+.comments{
+    margin-top: 30px;
+    /*max-height: 800px;*/
+}
+
+.container{
+    width: 90%;
+    margin: 0px auto;
+    margin-bottom: 20px;
+}
+
+#publicacion{
+    min-height: 50px;
+    background: lightblue;
+    padding: 20px;
+    border-radius: 7px;
+    margin: 20px;
+}
+
+#publicacion p{
+    font-size: 20px; 
+}
+
+[contentEditable=true]:empty:not(:focus):before{
+    content:attr(placeholder)
+}
+
+.commentBoxP{ 
+    color: gray;
+    font-size: 17px; 
+    line-height: 1.5em;
+}
+
+.commentBox2{ 
+    color: black;
+    font-size: 17px; 
+    line-height: 1.5em;
+    position: relative;
+    top: -45px;
+    height: 10px;
+}
+
+[contenteditable] {
+    outline: 0px solid transparent;
+}
+
+.button{
+    width: 100px; height: 30px;
+    background-color: rgba(254, 95, 119, 0.5); 
+    color: snow;
+    border: 1px;
+    border-radius: 15px; 
+    cursor: pointer;
+    transition: background-color 500ms;
+    font-size: 15px;
+    float: right;
+}
+
+.button:hover{
+    background-color: rgba(112, 59, 218, 0.5); 
+}
+
+#editImg{
+    width: 25px;
+    height: 25px;
+    float: right;
+    margin: -4%;
+}
+
+#doneImg{
+    width: 25px;
+    height: 25px;
+    float: right;
+    margin: -4%;
+}
+
+#deleteImg{
+    width: 25px;
+    height: 25px;
+    float: right;
+    margin: -4%;
+}
+
+.article{
+    padding: 10px 20px 0px 20px;
+}
+
+.editBtn{
+    background-color: lightblue; 
+    color: snow;
+    border: 1px;
+    border-radius: 15px; 
+    cursor: pointer;
+    transition: background-color 500ms;
+    position: relative;
+    right: 20px;
+    top: -90px;
+    float: right;
+    
+}
+
+.editBtn:hover{
+    background-color: #a02f8757; 
+}
+
+.deleteBtn{
+    background-color: lightcoral; 
+    color: snow;
+    border: 1px;
+    border-radius: 15px; 
+    cursor: pointer;
+    transition: background-color 500ms;
+    position: relative;
+    right: -45px;
+    top: -90px;
+    float: right;
+}
+
+.deleteBtn:hover{
+    background-color: #2f37a057; 
+}
+
+#contenido{
+    float: left;
+    width: 100%;
+    min-height: 500px;
+    background: transparent;
+    padding: 0px 25px;
+}
+
+.article{
+    color: black;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid black;
+   
+}
+
+.datepkd, .datepkdP{
+    background: #f0f0f000;
+    border: 1px;
+    font-size: 15px;
+}
+
+.datepkdP{
+    margin-top: 25px;
+}
+
+#buttons {      /* estilo de botones */
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    padding: 3px 0px;
+}
+#buttons a{
+    background-color: rgb(39, 179, 179); 
+    color: snow;
+    border: 1px;
+    border-radius: 15px; 
+    cursor: pointer;
+    transition: background-color 500ms;
+    margin: 5px 7px 5px;
+    height: 100%;
+    padding: 7px 15px;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.paginacion ul{
+    list-style: none;
+    text-align: center;
+}
+
+.paginacion ul li{
+    display: inline-block;
+    margin: 5px;
+    padding: 12px 23px;
+}
+
+.paginacion ul li:hover{
+    color: whitesmoke;
+    background-color: rgba(105, 90, 205, 0.548);
+    border: 3px;
+    border-radius: 30px;
+    padding: 12px 23px;
+}
+
+#ulli{
+    margin: 0px;
+    padding: 0px;
+}
+
+.searchList ul{
+    list-style: none;
+    display: none;
+}
+
+.searchList ul li{
+    margin: 5px;
+}
+
+/* fin de sección de comentarios */

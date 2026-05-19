@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Cabin&family=PT+Sans&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    font-family: 'Cabin', sans-serif;
+    /*font-family: 'PT Sans', sans-serif;*/
+}
+
+a{
+    text-decoration: none;
+}
+
+.nav{
+    width: 100%;
+    height: 80px;
+    background: linear-gradient(150deg, rgb(254, 95, 119), rgb(112, 59, 218), rgb(59, 182, 231));
+   /*background-size: 200% 100%;
+    animation: BgGradient 15s ease infinite;*/
+}
+@keyframes BgGradient{
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+
+.title{
+    padding: 18px;
+    font-size: 35px;
+    color: aliceblue;
+    text-shadow: -1px 1px 5px black;
+}
+
+/*Categorias*/
+.categorias{
+    display: flex;
+    flex-wrap: wrap;
+    /*­justify-content: center;
+    margin: auto;
+    margin-top: 100px;*/
+    width: 100%;
+}
+.categorias .card{
+    width: 100%;
+    height: 80px;
+    border-radius: 20px;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.527);
+    overflow: hidden;
+    margin: 25px 40px;
+    text-align: left;
+    transition: all 0.25s ease;
+    color: #2c1507;
+    text-decoration: none;
+}
+.text{
+    transition: .3 ease all;
+}
+.categorias h3{
+    padding: 25px;
+    padding-top: 25px;
+    font-size: 25px;
+    /*color: aliceblue;
+    text-shadow: -1px 1px 5px black;*/
+}
+.categorias .card::after{
+    content: "";
+    width: 100%;
+    height: 80px;
+    position: absolute;
+    transform: translate(0, -50px);
+    left: calc(80% + 50px);
+    transition: .7s ease-in-out all;
+    border-left: 170px solid transparent;
+    border-bottom: 170px solid skyblue;
+}
+.categorias .card:hover::after{
+    left: 30%;
+}
